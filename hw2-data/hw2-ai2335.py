@@ -134,3 +134,54 @@ plt.title('kNN prediction accuracy as a function of k')
 
 ### 2-D ###
 ###########
+# replacing all 0s with -1
+y_train_reg, y_test_reg = y_train, y_test
+y_train_reg = y_train_reg.reshape(-1,1)
+
+y_train_reg[y_train_reg == 0] = -1
+y_test_reg[y_test_reg == 0] = -1
+
+
+
+# add an extra dimesnion to data
+X_train_reg = np.concatenate((X_train, np.tile(1, (X_train.shape[0],1))), axis=1)
+X_test_reg = np.concatenate((X_test, np.tile(1, (X_test.shape[0],1))), axis=1)
+
+def sigmoid(scores):
+    return expit(scores)
+
+# Initializing the parameters
+num_iteration = 10000
+weights = np.zeros((1,X_train_reg.shape[1]))
+obj_function = np.empty([0,0])
+
+for steps in range(1,num_iteration + 1):   
+    # setting the learning rate
+    learning_rate = 1e-05/np.sqrt(1 + steps)
+
+      
+    scores = np.dot(np.multiply(y_train_reg, X_train_reg), weights.T)
+
+    s = sigmoid(scores)
+    # Updated weights with gradient ascend
+    output_error = np.multiply((1-s), y_train_reg)
+
+    gradient = np.dot(X_train_reg.T, output_error)
+    
+    weights += learning_rate * gradient.T
+
+    # Appending the objective value of iteratio
+    obj_function = np.append(obj_function, np.sum(np.log(s)))
+
+plt.figure(figsize=(12, 8))
+
+x = range(0, 10000)
+plot(obj_function)
+
+plt.xlim(0, 10000)
+plt.title('Objective function value for each iteration')
+plt.xlabel('iteration')
+plt.ylabel('objective function value')
+
+### 2-E ###
+###########
