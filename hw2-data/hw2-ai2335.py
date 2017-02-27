@@ -94,7 +94,7 @@ plt.show()
 ###########
 
 # Function to implement K Nearest Neighbours
-def knn_classifier(training_data, train_label, test_data, test_label, k):  
+def knn_classifier(training_data, train_label, test_data, test_label, k): 
     dist = np.empty([training_data.shape[0], ])
     knn_prediction = pd.DataFrame()
  
@@ -106,7 +106,7 @@ def knn_classifier(training_data, train_label, test_data, test_label, k):
             knn_index = dist[:, i].argsort()[:k]
             training_lables = y_train[knn_index]
 
-            knn_prediction.set_value(i, k, scipy.stats.mode(training_lables)[0][0])  
+            knn_prediction.set_value(i, k, scipy.stats.mode(training_lables)[0][0]) 
  
     # accuracy
     knn_arr = knn_prediction.values
@@ -136,7 +136,7 @@ plt.title('kNN prediction accuracy as a function of k')
 ###########
 # replacing all 0s with -1
 y_train_reg, y_test_reg = y_train, y_test
-y_train_reg = y_train_reg.reshape(-1,1)
+y_train_reg = y_train_reg.reshape(-1, 1)
 
 y_train_reg[y_train_reg == 0] = -1
 y_test_reg[y_test_reg == 0] = -1
@@ -144,8 +144,8 @@ y_test_reg[y_test_reg == 0] = -1
 
 
 # add an extra dimesnion to data
-X_train_reg = np.concatenate((X_train, np.tile(1, (X_train.shape[0],1))), axis=1)
-X_test_reg = np.concatenate((X_test, np.tile(1, (X_test.shape[0],1))), axis=1)
+X_train_reg = np.concatenate((X_train, np.tile(1, (X_train.shape[0], 1))), axis=1)
+X_test_reg = np.concatenate((X_test, np.tile(1, (X_test.shape[0], 1))), axis=1)
 
 def sigmoid(scores):
     return expit(scores)
@@ -155,7 +155,7 @@ num_iteration = 10000
 weights = np.zeros((1,X_train_reg.shape[1]))
 obj_function = np.empty([0,0])
 
-for steps in range(1,num_iteration + 1):   
+for steps in range(1, num_iteration + 1):  
     # setting the learning rate
     learning_rate = 1e-05/np.sqrt(1 + steps)
 
