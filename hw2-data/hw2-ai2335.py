@@ -214,12 +214,21 @@ for steps in range(1,num_iteration + 1):
     obj_function = np.append(obj_function, np.sum(np.log(s)))
 
 
-plt.figure(figsize=(12,8))
+plt.figure(figsize=(12, 8))
 
-x = range(0,10000)
+x = range(0, 10000)
 plot(obj_function)
 
-plt.xlim(0,100)
+plt.xlim(0, 100)
 plt.title('Objective function value for each iteration')
 plt.xlabel('iteration')
 plt.ylabel('objective function value')
+
+# calculating accuracy of prediction
+e_predict = sigmoid(np.dot(X_test_reg, weights.T))
+
+e_predict[e_predict >= 0.5] = 1
+e_predict[e_predict < 0.5] = -1
+
+e_accuracy = (e_predict == y_test_reg).sum()
+print("Accuracy:",e_accuracy)
