@@ -185,3 +185,41 @@ plt.ylabel('objective function value')
 
 ### 2-E ###
 ###########
+num_iteration = 100
+weights = np.zeros((1,X_train_reg.shape[1]))
+obj_function = np.empty([0,0])
+
+for steps in range(1,num_iteration + 1):   
+    # setting the learning rate
+    learning_rate = 1/np.sqrt( 1 + steps)
+    
+    scores = np.dot(np.multiply(y_train_reg, X_train_reg), weights.T)
+    
+    # Gradient
+    s = sigmoid(scores)
+    output_error = np.multiply((1-s), y_train_reg)
+    gradient = np.dot(X_train_reg.T, output_error)
+    
+    # Hessian
+    s_h = s * (1-s)
+    hessian = np.dot(X_train_reg.T, np.multiply(ss, X_train_reg))
+    hessian_invers = np.linalg.inv(gg)
+    
+    # adding Gradient and Hessian
+    t = np.dot(hessian_invers, gradient)
+    
+    weights += learning_rate * t.T
+
+    # Appending the objective value of iteratio
+    obj_function = np.append(obj_function, np.sum(np.log(s)))
+
+
+plt.figure(figsize=(12,8))
+
+x = range(0,10000)
+plot(obj_function)
+
+plt.xlim(0,100)
+plt.title('Objective function value for each iteration')
+plt.xlabel('iteration')
+plt.ylabel('objective function value')
