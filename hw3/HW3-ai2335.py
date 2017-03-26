@@ -52,7 +52,7 @@ def RMSE(y_predict, y_test, c):
     
     for i in range(len(c)):
         a = math.sqrt(np.sum((y_predict[i] - y_test)**2) / 42)
-        rmse.append(a)  
+        rmse.append(a) 
     return rmse
 
 rmse = RMSE(y_predict, y_test, c)
@@ -65,18 +65,18 @@ rmse_table.ix[rmse_table['rmse_value'].idxmin()]
 
 ## 1 -D
 #selecting only the 4th feature (car weight)
-X_train_car_weight = X_train[:,3].reshape(-1,1)
-X_test_car_weight = X_test[:,3].reshape(-1,1)
+X_train_car_weight = X_train[:, 3].reshape(-1, 1)
+X_test_car_weight = X_test[:, 3].reshape(-1, 1)
 
 # predicting based on reshaped data
 y_predict_4th = G_process(X_train_car_weight, y_train, X_test_car_weight, 5, 2)
 
-df_4 = pd.DataFrame({'x':X_test_car_weight[:,0], 'y':y_predict_4th.reshape(-1,1)[:,0]})
+df_4 = pd.DataFrame({'x': X_test_car_weight[:, 0], 'y': y_predict_4th.reshape(-1, 1)[:, 0]})
 df_4 = df_4.sort(['x'], ascending=[1])
 
-plt.figure(figsize=(12,8))
-plt.scatter(X_train_car_weight, y_train, alpha = '0.8', facecolors='#fdfd96', edgecolors='#ff6961', s = 40)
-plt.plot(df_4['x'], df_4['y'], '#966fd6', linewidth = 2.5)
+plt.figure(figsize=(12, 8))
+plt.scatter(X_train_car_weight, y_train, alpha='0.8', facecolors='#fdfd96', edgecolors='#ff6961', s=40)
+plt.plot(df_4['x'], df_4['y'], '#966fd6', linewidth=2.5)
 
 plt.ylabel('y values')
 plt.xlabel('X values')
@@ -94,8 +94,8 @@ y_train = np.genfromtxt('/Users/Amiros/GitHub/Machine Learning for Data Science/
 X_test0 = np.genfromtxt('/Users/Amiros/GitHub/Machine Learning for Data Science/hw3/data/boosting/X_test.csv',delimiter=',')
 y_test = np.genfromtxt('/Users/Amiros/GitHub/Machine Learning for Data Science/hw3/data/boosting/y_test.csv',delimiter=',')
 
-X_train = np.hstack((X_train0, np.ones((1036,1), dtype=np.int)))
-X_test = np.hstack((X_test0, np.ones((1000,1), dtype=np.int)))
+X_train = np.hstack((X_train0, np.ones((1036, 1), dtype=np.int)))
+X_test = np.hstack((X_test0, np.ones((1000, 1), dtype=np.int)))
 
 # Least Square classification
 def LS(X_train, y_train):
@@ -108,19 +108,19 @@ def LS(X_train, y_train):
 def AdaBoost(X_train, y_train, T):
 
     # create an index lsit with the size of training data
-    index = np.full((X_train.shape[0]), range(0,X_train.shape[0]))
+    index = np.full((X_train.shape[0]), range(0, X_train.shape[0]))
 
     # initial value
-    w = np.full((X_train.shape[0]), 1/X_train.shape[0])    
+    w = np.full((X_train.shape[0]), 1/X_train.shape[0])  
     B_table = []
     epsilon_list = []
     alpha_list = []
     coef_array = np.empty((0, 6))
     
-    for i in range(T):
+    for i in range(1500):
 
         # choose random from the index according to the w distribution
-        B_index = index[np.random.choice(index.shape[0], index.shape[0], replace=True, p= w)]
+        B_index = index[np.random.choice(index.shape[0], index.shape[0], replace=True, p=w)]
         B_table.append(B_index.tolist())
 
         # bootstrap samples
@@ -130,17 +130,24 @@ def AdaBoost(X_train, y_train, T):
         # predict
         coef = LS(B_X, B_y)
         y_pred = np.sign(X_train.dot(coef))
-        coef_array = np.append(coef_array, [coef], axis=0)
 
         # updating weights 
         epsilon = np.multiply((y_train != y_pred), w).sum()
+        if epsilon > 0.5:
+            coef = - coef
+            y_pred = np.sign(X_train.dot(coef))
+
+        epsilon = np.multiply((y_train != y_pred), w).sum()
+        coef_array = np.append(coef_array, [coef], axis=0)
+
         alpha = 0.5 * np.log((1 - epsilon)/epsilon)
-        
+
         epsilon_list.append(epsilon)
         alpha_list.append(alpha)
 
         w_est = np.multiply(w, np.exp(-alpha * np.multiply(y_train, y_pred)))
-        w = w_est/ w_est.sum()
+        w = w_est/w_est.sum()
+    
     return coef_array, B_table, alpha_list, epsilon_list
 
 
@@ -153,9 +160,9 @@ def error(X, y, coef, alpha, T):
     
     for i in range(T):
         a = alpha[i] * np.sign(X.dot(coef[i]))
-        final = np.append (final, a.reshape(-1,1), axis = 1)
+        final = np.append(final, a.reshape(-1, 1), axis=1)
 
-        pred = np.sign(np.sum(final, axis =1))
+        pred = np.sign(np.sum(final, axis=1))
         error = (pred != y).sum()/10
         error_table.append(error)
 
@@ -169,7 +176,7 @@ test_error = error(X_test, y_test, coef_array, alpha_list, 1500)
 train_error = error(X_train, y_train, coef_array, alpha_list, 1500)
 
 ## 2.A
-plt.figure(figsize=(12,8))
+plt.figure(figsize=(12, 8))
 
 plt.plot(test_error, '#779ECB', train_error, '#FF6961')
 plt.title('Training and Test error for boosting algorithm')
@@ -183,14 +190,14 @@ epsilon = (0.5 - epsilon_array) ** 2
 
 ss = []
 
-for i in range(1,1501):
+for i in range(1, 1501):
     s = np.sum(epsilon[0:i])
     ss.append(s)
 ss2 = np.array(ss)
 ss2 = np.exp(-2 * ss2)
-plt.figure(figsize=(12,8))
+plt.figure(figsize=(12, 8))
 
-plt.plot(ss2, '#AEC6CF', linewidth = 2)
+plt.plot(ss2, '#AEC6CF', linewidth=2)
 plt.title('The upper bound on the training error')
 plt.ylabel('%')
 plt.xlabel('T')
@@ -199,14 +206,14 @@ plt.xlim(-0.1, 1501)
 # 2.C
 flattened_B = [val for sublist in B_table for val in sublist]
 
-plt.figure(figsize=(12,8))
+plt.figure(figsize=(12, 8))
 
-plt.hist(flattened_B, bins='auto', color = '#AEC6CF')
-plt.xlim(-.05,1000.05)
+plt.hist(flattened_B, bins='auto', color='#AEC6CF')
+plt.xlim(-.05, 1000.05)
 plt.title('number of times each training data point was selected by the bootstrap')
 
 # 2.D
-plt.figure(figsize=(12,8))
+plt.figure(figsize=(12, 8))
 
 plt.plot(epsilon_list, '#CFCFC4')
 plt.title('Epsilon values over T')
@@ -215,7 +222,7 @@ plt.xlabel('T')
 plt.xlim(-0.05, 1500.05)
 plt.ylim(0, 1)
 
-plt.figure(figsize=(12,8))
+plt.figure(figsize=(12, 8))
 
 plt.plot(alpha_list, '#AEC6CF')
 plt.title('Alpha values over T')
